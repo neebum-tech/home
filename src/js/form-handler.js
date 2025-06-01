@@ -1,83 +1,99 @@
 document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('leadForm');
     
-    // URL do Google Apps Script (SUBSTITUA pela sua URL após deploy)
-    const APPS_SCRIPT_URL = 'COLE_AQUI_SUA_URL_DO_APPS_SCRIPT';
+    if (!form) {
+        console.error('Formulário não encontrado!');
+        return;
+    }
     
     form.addEventListener('submit', async function(e) {
         e.preventDefault();
         
-        // UI Loading
-        const submitBtn = document.querySelector('.submit-button');
+        const submitBtn = form.querySelector('.submit-button');
         const originalText = submitBtn.textContent;
+        
+        // Validação antes do envio
+        if (!validateForm()) {
+            return;
+        }
+        
+        // UI Loading
         submitBtn.textContent = 'Enviando...';
         submitBtn.disabled = true;
-        
-        // Coleta dados
-        const formData = {
-            name: document.getElementById('name').value.trim(),
-            email: document.getElementById('email').value.trim(),
-            phone: document.getElementById('phone').value.trim(),
-            message: document.getElementById('message').value.trim()
-        };
-        
-        // Validação
-        if (!formData.name || !formData.email || !formData.message) {
-            showMessage('❌ Por favor, preencha todos os campos obrigatórios.', 'error');
-            restoreButton(submitBtn, originalText);
-            return;
-        }
-        
-        if (!isValidEmail(formData.email)) {
-            showMessage('❌ Por favor, insira um email válido.', 'error');
-            restoreButton(submitBtn, originalText);
-            return;
-        }
+        submitBtn.classList.add('loading');
         
         try {
-            console.log('📤 Enviando lead para Google Sheets...');
+            const formData = new FormData(form);
             
-            const response = await fetch(APPS_SCRIPT_URL, {
+            // Adicionar informações extras
+            formData.append('timestamp', new Date().toLocaleString('pt-BR'));
+            formData.append('user_agent', navigator.userAgent);
+            formData.append('page_url', window.location.href);
+            
+            console.log('📤 Enviando lead via Web3Forms...');
+            
+            // URL correta do Web3Forms
+            const response = await fetch('https://api.web3forms.com/submit', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(formData)
+                body: formData
             });
             
             const result = await response.json();
-            console.log('📥 Resposta recebida:', result);
             
             if (result.success) {
                 showMessage('✅ Mensagem enviada com sucesso! Entraremos em contato em breve.', 'success');
                 form.reset();
                 
-                // Analytics
-                trackEvent('generate_lead', 'success', formData.name);
+                // Analytics (se configurado)
+                if (typeof gtag !== 'undefined') {
+                    gtag('event', 'generate_lead', {
+                        'event_category': 'form',
+                        'event_label': 'contact_form_web3forms',
+                        'value': 1
+                    });
+                }
                 
-                console.log('✅ Lead salvo com ID:', result.leadId);
+                console.log('✅ Lead enviado com sucesso via Web3Forms!');
                 
             } else {
-                throw new Error(result.error || 'Erro desconhecido no servidor');
+                throw new Error(result.message || 'Erro no envio');
             }
             
         } catch (error) {
             console.error('❌ Erro ao enviar:', error);
             
-            // Backup local
-            saveToLocalStorage(formData);
-            showMessage('⚠️ Erro no envio. Dados salvos localmente. Entraremos em contato!', 'warning');
-            
-            trackEvent('form_error', 'google_sheets_failed', error.message);
+            // Salvar localmente como backup
+            saveToLocalStorage();
+            showMessage('❌ Erro ao enviar mensagem. Dados salvos localmente. Tente novamente em alguns minutos.', 'error');
         }
         
-        restoreButton(submitBtn, originalText);
+        // Restaurar botão
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
+        submitBtn.classList.remove('loading');
     });
     
     // Funções auxiliares
-    function restoreButton(button, text) {
-        button.textContent = text;
-        button.disabled = false;
+    function validateForm() {
+        const name = document.getElementById('name').value.trim();
+        const email = document.getElementById('email').value.trim();
+        
+        if (!name || !email) {
+            showMessage('⚠️ Por favor, preencha pelo menos o nome e e-mail.', 'warning');
+            return false;
+        }
+        
+        if (!isValidEmail(email)) {
+            showMessage('❌ Por favor, insira um e-mail válido.', 'error');
+            return false;
+        }
+        
+        if (name.length < 2) {
+            showMessage('⚠️ Nome deve ter pelo menos 2 caracteres.', 'warning');
+            return false;
+        }
+        
+        return true;
     }
     
     function isValidEmail(email) {
@@ -85,87 +101,74 @@ document.addEventListener('DOMContentLoaded', function() {
         return emailRegex.test(email);
     }
     
-    function saveToLocalStorage(data) {
-        try {
-            let leads = JSON.parse(localStorage.getItem('neebum-leads') || '[]');
-            leads.push({
-                ...data,
-                id: Date.now(),
-                timestamp: new Date().toLocaleString('pt-BR'),
-                status: 'backup_local'
-            });
-            localStorage.setItem('neebum-leads', JSON.stringify(leads));
-            console.log('💾 Backup local salvo. Total:', leads.length);
-        } catch (error) {
-            console.error('❌ Erro ao salvar backup:', error);
-        }
-    }
-    
-    function showMessage(message, type = 'success') {
+    function showMessage(message, type) {
+        // Remove mensagem anterior
         const existingMessage = document.querySelector('.form-message');
-        if (existingMessage) existingMessage.remove();
+        if (existingMessage) {
+            existingMessage.remove();
+        }
         
+        // Criar nova mensagem
         const messageDiv = document.createElement('div');
         messageDiv.className = `form-message form-message-${type}`;
-        messageDiv.innerHTML = `
-            <div class="message-content">
-                <span class="message-text">${message}</span>
-                <button class="message-close" onclick="this.parentElement.parentElement.remove()">&times;</button>
-            </div>
-        `;
+        messageDiv.textContent = message;
         
-        form.parentNode.insertBefore(messageDiv, form.nextSibling);
+        // Inserir antes do formulário
+        form.parentNode.insertBefore(messageDiv, form);
         
+        // Auto-remover após 6 segundos
         setTimeout(() => {
-            if (messageDiv.parentNode) messageDiv.remove();
-        }, 8000);
+            if (messageDiv.parentNode) {
+                messageDiv.remove();
+            }
+        }, 6000);
+        
+        // Scroll suave para a mensagem
+        messageDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
     
-    function trackEvent(action, category, label) {
-        if (typeof gtag !== 'undefined') {
-            gtag('event', action, {
-                event_category: category,
-                event_label: label
-            });
+    function saveToLocalStorage() {
+        try {
+            const formData = {
+                name: document.getElementById('name').value,
+                email: document.getElementById('email').value,
+                phone: document.getElementById('phone').value,
+                message: document.getElementById('message').value,
+                timestamp: new Date().toISOString(),
+                status: 'pending_sync'
+            };
+            
+            const leads = JSON.parse(localStorage.getItem('neebum-leads-backup')) || [];
+            leads.push(formData);
+            localStorage.setItem('neebum-leads-backup', JSON.stringify(leads));
+            
+            console.log('💾 Lead salvo localmente como backup');
+        } catch (error) {
+            console.error('Erro ao salvar backup local:', error);
         }
-        
-        if (typeof fbq !== 'undefined') {
-            fbq('track', 'Lead');
-        }
+    }
+    
+    // Validação em tempo real
+    const emailInput = document.getElementById('email');
+    const nameInput = document.getElementById('name');
+    
+    if (emailInput) {
+        emailInput.addEventListener('blur', function() {
+            if (this.value && !isValidEmail(this.value)) {
+                this.style.borderColor = '#ef4444';
+            } else {
+                this.style.borderColor = '';
+            }
+        });
+    }
+    
+    if (nameInput) {
+        nameInput.addEventListener('blur', function() {
+            if (this.value && this.value.length < 2) {
+                this.style.borderColor = '#ef4444';
+            } else {
+                this.style.borderColor = '';
+            }
+        });
     }
 });
-
-// Função para exportar backup local
-function exportLocalLeads() {
-    const leads = JSON.parse(localStorage.getItem('neebum-leads') || '[]');
-    
-    if (leads.length === 0) {
-        alert('Nenhum lead encontrado no backup local!');
-        return;
-    }
-    
-    const csvHeader = 'Data/Hora,Nome,Email,Telefone,Mensagem,Status\n';
-    const csvRows = leads.map(lead => 
-        `"${lead.timestamp}","${lead.name}","${lead.email}","${lead.phone || 'Não informado'}","${lead.message.replace(/"/g, '""')}","${lead.status || 'local'}"`
-    ).join('\n');
-    
-    const blob = new Blob([csvHeader + csvRows], { type: 'text/csv;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `neebum-leads-backup-${new Date().toISOString().split('T')[0]}.csv`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    
-    alert(`✅ ${leads.length} leads exportados!`);
-}
-
-function clearLocalBackup() {
-    if (confirm('Tem certeza que deseja limpar o backup local?')) {
-        localStorage.removeItem('neebum-leads');
-        alert('✅ Backup local limpo!');
-    }
-}
