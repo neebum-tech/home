@@ -6,6 +6,18 @@ document.addEventListener('DOMContentLoaded', function() {
         return;
     }
     
+    // Detectar se estamos em localhost
+    const isLocalhost = window.location.protocol === 'file:' || 
+                       window.location.hostname === 'localhost' ||
+                       window.location.hostname === '127.0.0.1';
+    
+    if (isLocalhost && window.location.protocol === 'file:') {
+        console.warn('⚠️ Formulário funcionando em modo básico. Para teste completo, use um servidor local.');
+        // Em modo file://, deixa o formulário funcionar normalmente (sem AJAX)
+        return; 
+    }
+    
+    // Interceptar envio apenas se não for file://
     form.addEventListener('submit', async function(e) {
         e.preventDefault();
         
@@ -20,19 +32,12 @@ document.addEventListener('DOMContentLoaded', function() {
         // UI Loading
         submitBtn.textContent = 'Enviando...';
         submitBtn.disabled = true;
-        submitBtn.classList.add('loading');
         
         try {
             const formData = new FormData(form);
             
-            // Adicionar informações extras
-            formData.append('timestamp', new Date().toLocaleString('pt-BR'));
-            formData.append('user_agent', navigator.userAgent);
-            formData.append('page_url', window.location.href);
-            
             console.log('📤 Enviando lead via Web3Forms...');
             
-            // URL correta do Web3Forms
             const response = await fetch('https://api.web3forms.com/submit', {
                 method: 'POST',
                 body: formData
@@ -43,18 +48,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (result.success) {
                 showMessage('✅ Mensagem enviada com sucesso! Entraremos em contato em breve.', 'success');
                 form.reset();
-                
-                // Analytics (se configurado)
-                if (typeof gtag !== 'undefined') {
-                    gtag('event', 'generate_lead', {
-                        'event_category': 'form',
-                        'event_label': 'contact_form_web3forms',
-                        'value': 1
-                    });
-                }
-                
-                console.log('✅ Lead enviado com sucesso via Web3Forms!');
-                
+                console.log('✅ Lead enviado com sucesso!');
             } else {
                 throw new Error(result.message || 'Erro no envio');
             }
@@ -62,18 +56,17 @@ document.addEventListener('DOMContentLoaded', function() {
         } catch (error) {
             console.error('❌ Erro ao enviar:', error);
             
-            // Salvar localmente como backup
-            saveToLocalStorage();
-            showMessage('❌ Erro ao enviar mensagem. Dados salvos localmente. Tente novamente em alguns minutos.', 'error');
+            // Fallback: submeter o formulário normalmente
+            console.log('🔄 Tentando envio direto...');
+            form.submit();
+            return;
         }
         
         // Restaurar botão
         submitBtn.textContent = originalText;
         submitBtn.disabled = false;
-        submitBtn.classList.remove('loading');
     });
     
-    // Funções auxiliares
     function validateForm() {
         const name = document.getElementById('name').value.trim();
         const email = document.getElementById('email').value.trim();
@@ -88,11 +81,6 @@ document.addEventListener('DOMContentLoaded', function() {
             return false;
         }
         
-        if (name.length < 2) {
-            showMessage('⚠️ Nome deve ter pelo menos 2 caracteres.', 'warning');
-            return false;
-        }
-        
         return true;
     }
     
@@ -102,73 +90,17 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function showMessage(message, type) {
-        // Remove mensagem anterior
         const existingMessage = document.querySelector('.form-message');
-        if (existingMessage) {
-            existingMessage.remove();
-        }
+        if (existingMessage) existingMessage.remove();
         
-        // Criar nova mensagem
         const messageDiv = document.createElement('div');
         messageDiv.className = `form-message form-message-${type}`;
         messageDiv.textContent = message;
         
-        // Inserir antes do formulário
         form.parentNode.insertBefore(messageDiv, form);
         
-        // Auto-remover após 6 segundos
         setTimeout(() => {
-            if (messageDiv.parentNode) {
-                messageDiv.remove();
-            }
+            if (messageDiv.parentNode) messageDiv.remove();
         }, 6000);
-        
-        // Scroll suave para a mensagem
-        messageDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
-    
-    function saveToLocalStorage() {
-        try {
-            const formData = {
-                name: document.getElementById('name').value,
-                email: document.getElementById('email').value,
-                phone: document.getElementById('phone').value,
-                message: document.getElementById('message').value,
-                timestamp: new Date().toISOString(),
-                status: 'pending_sync'
-            };
-            
-            const leads = JSON.parse(localStorage.getItem('neebum-leads-backup')) || [];
-            leads.push(formData);
-            localStorage.setItem('neebum-leads-backup', JSON.stringify(leads));
-            
-            console.log('💾 Lead salvo localmente como backup');
-        } catch (error) {
-            console.error('Erro ao salvar backup local:', error);
-        }
-    }
-    
-    // Validação em tempo real
-    const emailInput = document.getElementById('email');
-    const nameInput = document.getElementById('name');
-    
-    if (emailInput) {
-        emailInput.addEventListener('blur', function() {
-            if (this.value && !isValidEmail(this.value)) {
-                this.style.borderColor = '#ef4444';
-            } else {
-                this.style.borderColor = '';
-            }
-        });
-    }
-    
-    if (nameInput) {
-        nameInput.addEventListener('blur', function() {
-            if (this.value && this.value.length < 2) {
-                this.style.borderColor = '#ef4444';
-            } else {
-                this.style.borderColor = '';
-            }
-        });
     }
 });
