@@ -50,16 +50,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 form.reset();
                 console.log('✅ Lead enviado com sucesso!');
             } else {
-                throw new Error(result.message || 'Erro no envio');
+                // Se o Web3Forms retornar um erro específico, use-o
+                throw new Error(result.message || 'Erro ao processar a solicitação pelo servidor.');
             }
             
         } catch (error) {
             console.error('❌ Erro ao enviar:', error);
-            
-            // Fallback: submeter o formulário normalmente
-            console.log('🔄 Tentando envio direto...');
-            form.submit();
-            return;
+            // Em vez de form.submit(), mostre uma mensagem de erro local.
+            // Você pode personalizar a mensagem de erro.
+            showMessage(`❌ Erro ao enviar: ${error.message}. Por favor, tente novamente.`, 'error');
+            // Não precisa mais do 'return;' aqui se não houver mais nada a fazer no catch.
         }
         
         // Restaurar botão
