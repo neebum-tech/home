@@ -1,0 +1,202 @@
+/* Responsive styles for the software house website */
+
+/* Mobile First - Tablets */
+@media (max-width: 768px) {
+    body {
+        font-size: 16px;
+    }
+
+    header {
+        padding: 10px;
+    }
+
+    .hero {
+        text-align: center;
+    }
+
+    .services {
+        flex-direction: column;
+    }
+
+    .contact-form {
+        padding: 20px;
+    }
+
+    .container {
+        padding: 0 15px;
+    }
+
+    .nav-links {
+        display: none;
+    }
+
+    .logo-img {
+        height: 35px;
+    }
+
+    .hero-logo-img {
+        height: 140px;
+    }
+
+    .hero-content h1 {
+        font-size: 2.5rem;
+    }
+
+    .hero-content p {
+        font-size: 1.1rem;
+    }
+
+    .services h2,
+    .about h2,
+    .contact h2 {
+        font-size: 2.2rem;
+    }
+
+    .services-grid {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+
+    .contact-content {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+
+    .footer-content {
+        flex-direction: column;
+        text-align: center;
+        gap: 1rem;
+    }
+
+    .footer-brand {
+        align-items: center;
+    }
+
+    .footer-links {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .footer-logo {
+        height: 40px;
+    }
+}
+
+/* Mobile - Smartphones */
+@media (max-width: 480px) {
+    .hero {
+        padding: 120px 0 60px;
+    }
+
+    .logo-img {
+        height: 30px;
+    }
+
+    .hero-logo {
+        margin-bottom: 2rem;
+    }
+
+    .hero-logo-img {
+        height: 100px;
+    }
+
+    .hero-content h1 {
+        font-size: 2rem;
+    }
+
+    .services,
+    .about,
+    .contact {
+        padding: 60px 0;
+    }
+
+    .service-card {
+        padding: 2rem 1.5rem;
+    }
+
+    .contact-form {
+        padding: 1.5rem;
+    }
+
+    .cta-button {
+        padding: 15px 25px;
+        font-size: 1rem;
+    }
+
+    .footer-logo {
+        height: 35px;
+    }
+}
+
+/* Tablet styles */
+@media (min-width: 769px) and (max-width: 1024px) {
+    body {
+        font-size: 18px;
+    }
+
+    header {
+        padding: 20px;
+    }
+
+    .hero {
+        text-align: left;
+    }
+
+    .services {
+        flex-direction: row;
+    }
+
+    .contact-form {
+        padding: 30px;
+    }
+}
+
+/* Desktop styles */
+@media (min-width: 1025px) {
+    body {
+        font-size: 20px;
+    }
+
+    header {
+        padding: 30px;
+    }
+
+    .hero {
+        text-align: left;
+    }
+
+    .services {
+        flex-direction: row;
+    }
+
+    .contact-form {
+        padding: 40px;
+    }
+}
+
+/* Large screens */
+@media (min-width: 1400px) {
+    .container {
+        max-width: 1400px;
+    }
+
+    .logo-img {
+        height: 45px;
+    }
+
+    .hero-logo-img {
+        height: 220px;
+    }
+
+    .hero-content h1 {
+        font-size: 3.8rem;
+    }
+
+    .services-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+
+    .footer-logo {
+        height: 55px;
+    }
+}

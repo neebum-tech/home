@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neebum Tech - Desenvolvimento de Software Personalizado</title>
+    <meta name="description" content="Transformamos suas ideias em soluções digitais inovadoras. Software personalizado, aplicações web e mobile.">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+    <!-- Header Component -->
+    <header class="header">
+        <nav class="navbar">
+            <div class="container">
+                <div class="logo">
+                    <h2>Neebum Tech</h2>
+                </div>
+                <div class="nav-links">
+                    <a href="#services">Serviços</a>
+                    <a href="#about">Sobre</a>
+                    <a href="#contact">Contato</a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-logo">
+                    <img src="../assets/logo-neebum.png" alt="Neebum Tech Logo" class="hero-logo-img">
+                </div>
+                <h1>Transformamos Suas Ideias em <span class="highlight">Soluções Digitais</span></h1>
+                <p>Na Neebum Tech, desenvolvemos software personalizado, aplicações web e mobile que impulsionam o crescimento do seu negócio com tecnologia de ponta.</p>
+                <a href="#contact" class="cta-button">Solicite um Orçamento Gratuito</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section id="services" class="services">
+        <div class="container">
+            <h2>Nossos Serviços</h2>
+            <div class="services-grid">
+                <div class="service-card">
+                    <div class="service-icon">🌐</div>
+                    <h3>Desenvolvimento Web</h3>
+                    <p>Sites e aplicações web responsivas, modernas e otimizadas para performance</p>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">📱</div>
+                    <h3>Aplicativos Mobile</h3>
+                    <p>Apps nativos e híbridos para iOS e Android com design intuitivo</p>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">⚙️</div>
+                    <h3>Software Personalizado</h3>
+                    <p>Sistemas sob medida desenvolvidos especificamente para sua empresa</p>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">🔧</div>
+                    <h3>Consultoria Tech</h3>
+                    <p>Análise e otimização de processos tecnológicos existentes</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="about">
+        <div class="container">
+            <h2>Por que escolher a Neebum Tech?</h2>
+            <div class="about-content">
+                <div class="about-text">
+                    <p>Somos uma software house especializada em transformar ideias em realidade digital. Com foco em inovação e qualidade, oferecemos soluções tecnológicas que fazem a diferença no seu negócio.</p>
+                    <ul>
+                        <li>✅ Desenvolvimento ágil e eficiente</li>
+                        <li>✅ Tecnologias modernas e atualizadas</li>
+                        <li>✅ Suporte contínuo pós-entrega</li>
+                        <li>✅ Preços competitivos</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Form Section -->
+    <section id="contact" class="contact">
+        <div class="container">
+            <h2>Vamos Conversar Sobre Seu Projeto</h2>
+            <div class="contact-content">
+                <div class="contact-info">
+                    <h3>Entre em Contato</h3>
+                    <div class="contact-item">
+                        <span>📧</span>
+                        <a href="mailto:neebum.tech@gmail.com">neebum.tech@gmail.com</a>
+                    </div>
+                    <div class="contact-item">
+                        <span>📱</span>
+                        <a href="https://www.instagram.com/neebum.tech/" target="_blank">@neebum.tech</a>
+                    </div>
+                </div>
+                <form id="leadForm" class="contact-form" action="https://api.web3forms.com/submit" method="POST">
+                    <!-- Web3Forms Configuration -->
+                    <input type="hidden" name="access_key" value="a36ae76f-6ce7-4312-b448-9ca80eea50b7">
+                    <input type="hidden" name="subject" value="Novo Lead - Neebum Tech">
+                    <input type="hidden" name="from_name" value="Neebum Tech Website">
+                    <input type="hidden" name="redirect" value="https://web3forms.com/success">
+                    
+                    <div class="form-group">
+                        <input type="text" id="name" name="name" placeholder="Seu nome completo" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="email" id="email" name="email" placeholder="Seu melhor e-mail" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="tel" id="phone" name="phone" placeholder="Seu telefone">
+                    </div>
+                    <div class="form-group">
+                        <textarea id="message" name="message" placeholder="Conte-nos sobre seu projeto" rows="5"></textarea>
+                    </div>
+                    <button type="submit" class="submit-button">Enviar Mensagem</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer Component -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    
+                    <h3>Neebum Tech</h3>
+                    <p>Transformando ideias em soluções digitais</p>
+                </div>
+                <div class="footer-links">
+                    <a href="mailto:neebum.tech@gmail.com">neebum.tech@gmail.com</a>
+                    <a href="https://www.instagram.com/neebum.tech/" target="_blank">Instagram</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Neebum Tech. Todos os direitos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+    <script src="js/form-handler.js"></script>
+</body>
+</html>
